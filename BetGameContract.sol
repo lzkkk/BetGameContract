@@ -105,6 +105,7 @@ contract GuessingGame is Ownable{
    uint public drawInterval;
    uint public distributeInterval;
    bool public enable;
+   uint public gameStatus;  // 0: game begin 1:betting begin 2:betting end 3:drawing/distribute beging 4:game end
 
    function GuessingGame(){
        
@@ -114,8 +115,15 @@ contract GuessingGame is Ownable{
         enable = true;
         fee = 100;  // 1%
         feeAddress = msg.sender;
-        initNextGame();
         
+        currentGameInfo.gameBegin = block.number;
+        currentGameInfo.betBegin = currentGameInfo.gameBegin + 1;
+        currentGameInfo.betEnd = currentGameInfo.betBegin + betInterval;
+        currentGameInfo.drawBlock = currentGameInfo.betEnd + drawInterval;
+
+        currentGameInfo.totalBet += this.balance;
+        
+        gameStatus = 0;
    } 
    
    function DestroyGame(address _newContract) onlyOwner{
@@ -126,15 +134,21 @@ contract GuessingGame is Ownable{
    }
    
    function initNextGame() public{
+        lastGameInfo = currentGameInfo;
+        if (gameHistory.length > 100) {
+           delete gameHistory[0];
+        }
+        gameHistory.push(currentGameInfo);
+        delete currentGameInfo;
        
         currentGameInfo.gameBegin = block.number;
         currentGameInfo.betBegin = currentGameInfo.gameBegin + 1;
         currentGameInfo.betEnd = currentGameInfo.betBegin + betInterval;
         currentGameInfo.drawBlock = currentGameInfo.betEnd + drawInterval;
-        currentGameInfo.distributeBlock = currentGameInfo.drawBlock + distributeInterval;
-        currentGameInfo.gameEnd = currentGameInfo.distributeBlock + 1;
+
         currentGameInfo.totalBet += this.balance;
         
+        gameStatus = 0;
    }
    
    function setGamePama(uint _betInterval, uint _drawInterval, uint _distributeInterval, bool _enable) onlyOwner{
@@ -206,14 +220,10 @@ contract GuessingGame is Ownable{
                 }
             }
         }
-
-       lastGameInfo = currentGameInfo;
-       if (gameHistory.length > 100) {
-           delete gameHistory[0];
-       }
-       gameHistory.push(currentGameInfo);
-       delete currentGameInfo;
-       initNextGame();
+       
+       gameStatus = 3;
+       currentGameInfo.distributeBlock = block.number;
+       currentGameInfo.gameEnd = currentGameInfo.distributeBlock + 10;
    }
    
    function getDrawHistory() public constant returns (uint[], uint[], uint[]){
