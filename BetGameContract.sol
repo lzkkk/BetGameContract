@@ -108,8 +108,8 @@ contract GuessingGame is Ownable{
 
    function GuessingGame(){
        
-        betInterval = 10;
-        drawInterval = 1;
+        betInterval = 1000;
+        drawInterval = 10;
         distributeInterval = 0;
         enable = true;
         fee = 100;  // 1%
@@ -132,13 +132,13 @@ contract GuessingGame is Ownable{
         currentGameInfo.betEnd = currentGameInfo.betBegin + betInterval;
         currentGameInfo.drawBlock = currentGameInfo.betEnd + drawInterval;
         currentGameInfo.distributeBlock = currentGameInfo.drawBlock + distributeInterval;
-        currentGameInfo.gameEnd = currentGameInfo.drawBlock + 1;
+        currentGameInfo.gameEnd = currentGameInfo.distributeBlock + 1;
         currentGameInfo.totalBet += this.balance;
         
    }
    
    function setGamePama(uint _betInterval, uint _drawInterval, uint _distributeInterval, bool _enable) onlyOwner{
-       require(_betInterval >= 0 && _drawInterval >= 0 && _distributeInterval >= 0);
+       require(block.number > currentGameInfo.gameEnd && _betInterval >= 0 && _drawInterval >= 0 && _distributeInterval >= 0);
        betInterval = _betInterval;
        drawInterval = _drawInterval;
        distributeInterval = _distributeInterval;
