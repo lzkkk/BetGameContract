@@ -176,6 +176,9 @@ contract GuessingGame is Ownable{
    }
    
    function drawing() onlyOwner{
+    
+       require(block.number >= currentGameInfo.drawBlock);
+
        uint randomNum = random(0);
        uint offSet = randomNum % 200 + 1;
        randomNum = random(offSet);
