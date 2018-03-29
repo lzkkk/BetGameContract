@@ -133,22 +133,22 @@ contract GuessingGame is Ownable{
        
    }
    
-   function initNextGame() public{
+   function initNextGame() public {
+        
         lastGameInfo = currentGameInfo;
         if (gameHistory.length > 100) {
            delete gameHistory[0];
         }
         gameHistory.push(currentGameInfo);
         delete currentGameInfo;
-       
+        clearBetInfo();
         currentGameInfo.gameBegin = block.number;
         currentGameInfo.betBegin = currentGameInfo.gameBegin + 1;
         currentGameInfo.betEnd = currentGameInfo.betBegin + betInterval;
         currentGameInfo.drawBlock = currentGameInfo.betEnd + drawInterval;
-
         currentGameInfo.totalBet += this.balance;
-        
         gameStatus = 0;
+        
    }
    
    function setGamePama(uint _betInterval, uint _drawInterval, uint _distributeInterval, bool _enable) onlyOwner{
@@ -191,7 +191,7 @@ contract GuessingGame is Ownable{
    
    function drawing() onlyOwner{
     
-       require(block.number >= currentGameInfo.drawBlock);
+       //require(block.number >= currentGameInfo.drawBlock);
 
        uint randomNum = random(0);
        uint offSet = randomNum % 200 + 1;
@@ -238,19 +238,20 @@ contract GuessingGame is Ownable{
            totalBet[i] = drawHistory[i].totalBet;
        }
        return (drawNum, blockNum, totalBet);
+       
    }
   
    
-   function getBetHistoryByAddress(address _betAddress) public constant returns(uint[][]){
+   function getBetHistoryByAddress(address _betAddress) public constant returns(uint[8][]){
        
-       uint[][] memory addressBetInfos = new uint[][](100);
+       uint[8][] memory addressBetInfos = new uint[8][](101);
        uint k = 0;
        for (uint i = 0; i < gameHistory.length; i ++) {
            GuessingGameInfo game = gameHistory[i];
            bool hasRecord =  false;
            for (uint j = 0; j < game.betInfos.length; j ++) {
-               BetInfo info = currentGameInfo.betInfos[i];
-               uint drawBlock = currentGameInfo.drawBlock;
+               BetInfo info = game.betInfos[j];
+               uint drawBlock = game.drawBlock;
                if (info.betAddress == _betAddress) {
                    addressBetInfos[k][info.bbnum] += info.betValue;
                    hasRecord = true;
@@ -261,6 +262,20 @@ contract GuessingGame is Ownable{
                 addressBetInfos[k][0] = drawBlock;
             }
        }
+       
+       hasRecord = false;
+       for (i = 0; i < currentGameInfo.betInfos.length; i ++) {
+           info = currentGameInfo.betInfos[i];
+           if (info.betAddress == _betAddress) {
+                addressBetInfos[k][info.bbnum] += info.betValue;
+                hasRecord = true;
+            }
+       }
+       if (hasRecord) {
+            k ++;
+            addressBetInfos[k][0] = drawBlock;
+        }
+        
        return addressBetInfos;
        
    }
@@ -292,4 +307,9 @@ contract GuessingGame is Ownable{
         return b;
     }
     
+    function clearBetInfo() internal constant {
+        for (uint i = 0; i < 7; i++) {
+            currentGameInfo.betPoolInfo[i+1] = 0;
+        }
+    }
 }
