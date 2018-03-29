@@ -93,7 +93,7 @@ contract GuessingGame is Ownable{
    }
    
    DrawHistory[] drawHistory;   //
-   GuessingGameInfo[] gameHistory;
+   GuessingGameInfo[] public gameHistory;
    GuessingGameInfo public lastGameInfo;      // last gameinfo 
    GuessingGameInfo public currentGameInfo;   // current gameinfo 
    
@@ -242,41 +242,46 @@ contract GuessingGame is Ownable{
    }
   
    
-   function getBetHistoryByAddress(address _betAddress) public constant returns(uint[8][]){
+   function getBetHistoryByAddress(address _betAddress) public constant returns(uint[9][]){
        
-       uint[8][] memory addressBetInfos = new uint[8][](101);
-       uint k = 0;
-       for (uint i = 0; i < gameHistory.length; i ++) {
-           GuessingGameInfo game = gameHistory[i];
-           bool hasRecord =  false;
-           for (uint j = 0; j < game.betInfos.length; j ++) {
-               BetInfo info = game.betInfos[j];
-               uint drawBlock = game.drawBlock;
-               if (info.betAddress == _betAddress) {
-                   addressBetInfos[k][info.bbnum] += info.betValue;
-                   hasRecord = true;
-               }
-           }
-           if (hasRecord) {
-                k ++;
-                addressBetInfos[k][0] = drawBlock;
+        uint[9][] memory addressBetInfos = new uint[9][](101);
+        uint k = 0;
+        for (uint i = 0; i < gameHistory.length; i ++) {
+            GuessingGameInfo game = gameHistory[i];
+            uint drawBlock = game.drawBlock;
+            bool hasRecord =  false;
+            for (uint j = 0; j < game.betInfos.length; j ++) {
+                BetInfo info = game.betInfos[j];
+                if (info.betAddress == _betAddress) {
+                  addressBetInfos[k][info.bbnum] += info.betValue;
+                  hasRecord = true;
+                }
             }
-       }
+            if (hasRecord) {
+                addressBetInfos[k][0] = drawBlock;
+                addressBetInfos[k][8] = game.drawNum;
+                k ++;
+            }
+        }
        
-       hasRecord = false;
-       for (i = 0; i < currentGameInfo.betInfos.length; i ++) {
-           info = currentGameInfo.betInfos[i];
-           if (info.betAddress == _betAddress) {
+        hasRecord = false;
+        for (i = 0; i < currentGameInfo.betInfos.length; i ++) {
+            info = currentGameInfo.betInfos[i];
+            if (info.betAddress == _betAddress) {
                 addressBetInfos[k][info.bbnum] += info.betValue;
                 hasRecord = true;
             }
-       }
-       if (hasRecord) {
-            k ++;
-            addressBetInfos[k][0] = drawBlock;
         }
         
-       return addressBetInfos;
+        drawBlock = currentGameInfo.drawBlock;
+        uint drawNum = currentGameInfo.drawNum;
+        if (hasRecord) {
+            addressBetInfos[k][0] = drawBlock;
+            addressBetInfos[k][8] = drawNum;
+            k ++;
+        }
+        
+        return (addressBetInfos);
        
    }
    
@@ -284,7 +289,7 @@ contract GuessingGame is Ownable{
         uint256 length = 7;
         uint256[] memory betInfo = new uint256[](length);
         for (uint i = 0; i < length; i++) {
-               betInfo[i] = currentGameInfo.betPoolInfo[i+1];
+            betInfo[i] = currentGameInfo.betPoolInfo[i+1];
         }
         return betInfo;
    }
