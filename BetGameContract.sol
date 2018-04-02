@@ -226,18 +226,16 @@ contract GuessingGame is Ownable{
        currentGameInfo.gameEnd = currentGameInfo.distributeBlock + 10;
    }
    
-   function getDrawHistory() public constant returns (uint[], uint[], uint[]){
+   function getDrawHistory() public constant returns (uint[3][]){
        
        uint256 length = drawHistory.length;
-       uint[] memory drawNum = new uint[](length);
-       uint[] memory blockNum = new uint[](length);
-       uint[] memory totalBet = new uint[](length);
+       uint[3][] memory historys = new uint[3][](length);
        for(uint i = 0; i < drawHistory.length; ++i){
-           drawNum[i] = drawHistory[i].drawNum;
-           blockNum[i] = drawHistory[i].blockNum;
-           totalBet[i] = drawHistory[i].totalBet;
+           historys[i][0] = drawHistory[i].blockNum;
+           historys[i][1] = drawHistory[i].drawNum;
+           historys[i][2] = drawHistory[i].totalBet;
        }
-       return (drawNum, blockNum, totalBet);
+       return historys;
        
    }
   
