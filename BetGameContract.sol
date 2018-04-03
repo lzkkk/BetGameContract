@@ -101,23 +101,28 @@ contract GuessingGame is Ownable{
    
    uint public fee;
    address public feeAddress;
+   
+   uint public gameBeginInterval;
    uint public betInterval;
    uint public drawInterval;
    uint public distributeInterval;
+   uint public gameEndInterval;
+   
    bool public enable;
    uint public gameStatus;  // 0: game begin 1:betting begin 2:betting end 3:drawing/distribute beging 4:game end
 
    function GuessingGame(){
-       
+        gameBeginInterval = 10;
         betInterval = 1000;
         drawInterval = 10;
+        gameEndInterval = 10;
         distributeInterval = 0;
         enable = true;
-        fee = 100;  // 1%
+        fee = 300;  // 3%
         feeAddress = msg.sender;
         
         currentGameInfo.gameBegin = block.number;
-        currentGameInfo.betBegin = currentGameInfo.gameBegin + 1;
+        currentGameInfo.betBegin = currentGameInfo.gameBegin + gameBeginInterval;
         currentGameInfo.betEnd = currentGameInfo.betBegin + betInterval;
         currentGameInfo.drawBlock = currentGameInfo.betEnd + drawInterval;
 
@@ -143,7 +148,7 @@ contract GuessingGame is Ownable{
         delete currentGameInfo;
         clearBetInfo();
         currentGameInfo.gameBegin = block.number;
-        currentGameInfo.betBegin = currentGameInfo.gameBegin + 1;
+        currentGameInfo.betBegin = currentGameInfo.gameBegin + gameBeginInterval;
         currentGameInfo.betEnd = currentGameInfo.betBegin + betInterval;
         currentGameInfo.drawBlock = currentGameInfo.betEnd + drawInterval;
         currentGameInfo.totalBet += this.balance;
@@ -151,11 +156,13 @@ contract GuessingGame is Ownable{
         
    }
    
-   function setGamePama(uint _betInterval, uint _drawInterval, uint _distributeInterval, bool _enable) onlyOwner{
-       require(block.number > currentGameInfo.gameEnd && _betInterval >= 0 && _drawInterval >= 0 && _distributeInterval >= 0);
+   function setGamePama(uint _gameBeginInterval, uint _betInterval, uint _drawInterval, uint _distributeInterval,uint _gameEndInterval, bool _enable) onlyOwner{
+       require(block.number > currentGameInfo.gameEnd && _gameBeginInterval >= 0 && _gameEndInterval >= 0 && _betInterval >= 0 && _drawInterval >= 0 && _distributeInterval >= 0);
+       gameBeginInterval = _gameBeginInterval;
        betInterval = _betInterval;
        drawInterval = _drawInterval;
        distributeInterval = _distributeInterval;
+       gameEndInterval = _gameEndInterval;
        enable = _enable;
    }
    
@@ -223,7 +230,7 @@ contract GuessingGame is Ownable{
        
        gameStatus = 3;
        currentGameInfo.distributeBlock = block.number;
-       currentGameInfo.gameEnd = currentGameInfo.distributeBlock + 10;
+       currentGameInfo.gameEnd = currentGameInfo.distributeBlock + gameEndInterval;
    }
    
    function getDrawHistory() public constant returns (uint[3][]){
