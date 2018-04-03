@@ -108,6 +108,8 @@ contract GuessingGame is Ownable{
    uint public distributeInterval;
    uint public gameEndInterval;
    
+   uint public currentPhase;
+   
    bool public enable;
    uint public gameStatus;  // 0: game begin 1:betting begin 2:betting end 3:drawing/distribute beging 4:game end
 
@@ -129,6 +131,8 @@ contract GuessingGame is Ownable{
         currentGameInfo.totalBet += this.balance;
         
         gameStatus = 0;
+        
+        currentPhase++;
    } 
    
    function DestroyGame(address _newContract) onlyOwner{
@@ -154,6 +158,7 @@ contract GuessingGame is Ownable{
         currentGameInfo.totalBet += this.balance;
         gameStatus = 0;
         
+        currentPhase++;
    }
    
    function setGamePama(uint _gameBeginInterval, uint _betInterval, uint _drawInterval, uint _distributeInterval,uint _gameEndInterval, bool _enable) onlyOwner{
