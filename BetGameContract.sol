@@ -1,4 +1,3 @@
-pragma solidity ^0.4.21;
 pragma experimental ABIEncoderV2;
 
 /**
@@ -113,15 +112,15 @@ contract GuessingGame is Ownable{
    bool public enable;
    uint public gameStatus;  // 0: game begin 1:betting begin 2:betting end 3:drawing/distribute beging 4:game end
 
-   function GuessingGame(){
+   function GuessingGame(address _feeAddress){
         gameBeginInterval = 10;
         betInterval = 1000;
         drawInterval = 10;
         gameEndInterval = 10;
         distributeInterval = 0;
         enable = true;
-        fee = 300;  // 3%
-        feeAddress = msg.sender;
+        fee = 100;  // 1%
+        feeAddress = _feeAddress;
         
         currentGameInfo.gameBegin = block.number;
         currentGameInfo.betBegin = currentGameInfo.gameBegin + gameBeginInterval;
@@ -203,7 +202,7 @@ contract GuessingGame is Ownable{
    
    function drawing() onlyOwner{
     
-       //require(block.number >= currentGameInfo.drawBlock);
+       require(block.number >= currentGameInfo.drawBlock);
 
        uint randomNum = random(0);
        uint offSet = randomNum % 200 + 1;
@@ -228,7 +227,7 @@ contract GuessingGame is Ownable{
                     info.betAddress.transfer(betGet);
                     feeAddress.transfer(betFee);
                     distributeEvent(block.number, info.betAddress, betGet);
-                    currentGameInfo.totalBet = currentGameInfo.totalBet - betGet - betFee;
+                    // currentGameInfo.totalBet = currentGameInfo.totalBet - betGet - betFee;
                 }
             }
         }
