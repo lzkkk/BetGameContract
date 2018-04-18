@@ -256,9 +256,9 @@ contract GuessingGame is Ownable{
    }
   
    
-   function getBetHistoryByAddress(address _betAddress) public constant returns(uint[10][]){
+   function getBetHistoryByAddress(address _betAddress) public constant returns(uint[11][]){
        
-        uint[10][] memory addressBetInfos = new uint[10][](101);
+        uint[11][] memory addressBetInfos = new uint[11][](101);
         uint k = 0;
         for (uint i = 0; i < gameHistory.length; i ++) {
             GuessingGameInfo game = gameHistory[i];
@@ -275,6 +275,7 @@ contract GuessingGame is Ownable{
                 addressBetInfos[k][0] = drawBlock;
                 addressBetInfos[k][8] = game.drawNum;
                 addressBetInfos[k][9] = game.number;
+                addressBetInfos[k][10] = game.totalBet;
                 k ++;
             }
         }
@@ -294,6 +295,7 @@ contract GuessingGame is Ownable{
             addressBetInfos[k][0] = drawBlock;
             addressBetInfos[k][8] = drawNum;
             addressBetInfos[k][9] = game.number;
+            addressBetInfos[k][10] = game.totalBet;
             k ++;
         }
         
