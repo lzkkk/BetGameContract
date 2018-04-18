@@ -115,7 +115,7 @@ contract GuessingGame is Ownable{
 
    function GuessingGame(address _feeAddress){
         gameBeginInterval = 10;
-        betInterval = 100;
+        betInterval = 1000;
         drawInterval = 10;
         gameEndInterval = 10;
         distributeInterval = 0;
