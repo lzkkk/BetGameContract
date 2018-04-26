@@ -1,4 +1,3 @@
-pragma experimental ABIEncoderV2;
 
 /**
  * SafeMath
@@ -55,6 +54,7 @@ contract Ownable {
 // 竞猜
 contract GuessingGame is Ownable{
    using SafeMath for uint256;
+   using SafeMath for uint;
    
    //event 
    event betEvent(address _betAddress, uint _betNum, uint _betValue, bytes _betData, uint timestamp);
@@ -192,7 +192,7 @@ contract GuessingGame is Ownable{
        
       betEvent(betAddress, num, betValue, msg.data, block.timestamp);
        
-      require(betAddress != address(0) && betValue > 0 && betNumValid(num) && canBet());
+      require(betAddress != address(0) && betValue >= 1000000000000000 && betNumValid(num) && canBet());
 
       currentGameInfo.betInfos.push(BetInfo(betAddress, betValue, num));
       currentGameInfo.betPoolInfo[num] += betValue;
