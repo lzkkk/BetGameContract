@@ -56,8 +56,7 @@ contract Ownable {
 // 竞猜
 contract GuessingGame is Ownable{
    using SafeMath for uint256;
-   using SafeMath for uint;
-   
+
    //event 
    event betEvent(address _betAddress, uint _betNum, uint _betValue, bytes _betData, uint timestamp);
    event betBeginEvent(uint _blockNum);
@@ -117,9 +116,9 @@ contract GuessingGame is Ownable{
 
    function GuessingGame(address _feeAddress){
         gameBeginInterval = 10;
-        betInterval = 1000;
-        drawInterval = 10;
-        gameEndInterval = 10;
+        betInterval = 6000;
+        drawInterval = 20;
+        gameEndInterval = 100;
         distributeInterval = 0;
         enable = true;
         fee = 100;  // 1%
