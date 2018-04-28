@@ -166,7 +166,7 @@ contract GuessingGame is Ownable{
    }
    
    function setGamePama(uint _gameBeginInterval, uint _betInterval, uint _drawInterval, uint _distributeInterval,uint _gameEndInterval, bool _enable) onlyOwner{
-       require(block.number > currentGameInfo.gameEnd && _gameBeginInterval >= 0 && _gameEndInterval >= 0 && _betInterval >= 0 && _drawInterval >= 0 && _distributeInterval >= 0);
+       require(currentGameInfo.gameEnd > 0 && block.number > currentGameInfo.gameEnd && _gameBeginInterval >= 0 && _gameEndInterval >= 0 && _betInterval >= 0 && _drawInterval >= 0 && _distributeInterval >= 0);
        gameBeginInterval = _gameBeginInterval;
        betInterval = _betInterval;
        drawInterval = _drawInterval;
